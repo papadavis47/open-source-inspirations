@@ -1,15 +1,18 @@
 import Head from 'next/head'
 import Footer from '../components/Footer'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 const Home = () => {
-  const [username, setUserName] = useState('')
-  const [programmer, setProgrammer] = useState({})
+  const [programmer, setProgrammer] = useState('')
+  const [activeProgrammer, setActiveProgrammer] = useState(null)
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    console.log(username)
-    setUserName('')
+    const result = await fetch(
+      `https://api.github.com/users/${programmer}`
+    ).then((data) => data.json())
+    setActiveProgrammer(result)
+    setProgrammer('')
   }
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-2">
@@ -35,13 +38,12 @@ const Home = () => {
 
           <form className="mt-3" onSubmit={handleSubmit}>
             <div className="flex flex-col">
-              <label htmlFor="username">username</label>
               <input
                 type="text"
                 name="username"
                 className="my-3 outline"
-                onChange={(e) => setUserName(e.target.value)}
-                value={username}
+                onChange={(e) => setProgrammer(e.target.value)}
+                value={programmer}
               />
             </div>
             <button
@@ -52,6 +54,13 @@ const Home = () => {
             </button>
           </form>
         </section>
+        {activeProgrammer && (
+          <div className="test">
+            <pre>{JSON.stringify(activeProgrammer, null, 2)}</pre>
+            <h1>{activeProgrammer.login}</h1>
+            <h2>{activeProgrammer.name}</h2>
+          </div>
+        )}
       </main>
       <Footer />
     </div>
